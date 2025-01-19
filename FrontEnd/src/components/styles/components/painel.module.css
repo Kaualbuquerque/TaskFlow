@@ -1,0 +1,26 @@
+.painel{
+    background-color: #E4CEF2;
+
+    width: 90%;
+    height: 600px;
+    display: flex;
+    align-items: center;    
+    justify-content: space-around;
+    border-radius: 0px 0px 25px 25px;
+}   
+
+.painel div{
+    width: 30%;
+
+}
+
+.painel h1{
+    font-size: 3rem;
+}
+
+.painel p{
+    color: #3E3E3E;
+    font-weight: 500;
+
+    margin-bottom: 5em;
+}

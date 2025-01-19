@@ -1,0 +1,74 @@
+.taskBanner {
+    width: 50%;
+    padding: 1em 2em;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 8px 2px #0000001a;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.taskBanner>div {
+    width: 100%;
+}
+
+.description>p {
+    max-width: 97%;
+    color: #00000080;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nonowrap;
+}
+
+.infos {
+    max-width: 95%;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+}
+
+
+.customCheckbox input[type="checkbox"] {
+    display: none;
+}
+
+.customCheckbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.customCheckbox .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #E4CEF2;
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    margin-right: 8px;
+    transition: all 0.3s ease;
+}
+
+.customCheckbox input[type="checkbox"]:checked + .checkmark {
+    background-color: #E4CEF2;
+    border-color: #E4CEF2;
+}
+
+.customCheckbox input[type="checkbox"]:checked + .checkmark::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Efeito ao passar o mouse */
+.customCheckbox .checkmark:hover {
+    background-color: #f0f0f0;
+    border-color: #c6afd4;
+}

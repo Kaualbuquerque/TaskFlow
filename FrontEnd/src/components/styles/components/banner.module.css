@@ -1,0 +1,27 @@
+.banner,
+.bannerAlt {
+    background-color: #E4CEF2;
+    width: 375px;
+    height: 200px;
+    padding-bottom: 1em;
+    border-radius: 25px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+}
+
+.banner p,
+.bannerAlt p {
+    font-size: 1.1rem;
+}
+
+.banner h2,
+.bannerAlt h2 {
+    font-size: 3em;
+}
+
+
+.bannerAlt {
+    background-color: #fff;
+    box-shadow: 0px 0px 4px #0000001a;
+}

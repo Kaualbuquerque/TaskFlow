@@ -1,0 +1,41 @@
+.listBanner {
+    width: 210px;
+    height: 250px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 8px 2px #0000001a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2em 0 6em 0;
+    cursor: pointer;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.listBanner:hover{
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.listBanner h3{
+    font-weight: 900;
+}
+
+.listBanner p{
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.listBanner a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.link{
+    text-decoration: none;
+}
+
+.link:visited{
+    color: #000;
+}
