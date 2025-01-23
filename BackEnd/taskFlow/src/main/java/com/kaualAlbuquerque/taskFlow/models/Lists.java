@@ -14,6 +14,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = Lists.TABLE_NAME)
 public class Lists {
@@ -30,6 +32,7 @@ public class Lists {
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;
+
 
     @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
@@ -68,6 +71,7 @@ public class Lists {
         this.name = name;
     }
 
+    @JsonIgnore
     public List<Task> getTasks() {
         return this.tasks;
     }
