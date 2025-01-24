@@ -13,7 +13,7 @@ function Painel() {
             <div>
                 <h1>Organize your tasks and keep them on track, everywhere!</h1>
                 <p>We provide a seamless task management solution to keep you organized and efficient.</p>
-                <LinkButton style="btnLarge" text="Start now" address={"/lists"}/>
+                <LinkButton style="btnLarge" text="Start now" address={"/login"}/>
             </div>
             <img src={icon} alt="Clip board"/>
         </div>

@@ -1,14 +1,21 @@
-.home{
+.home {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.banners{
+.banners {
     width: 95%;
     margin-top: 3em;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+}
+
+.banners a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
 }

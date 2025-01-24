@@ -8,18 +8,22 @@ import LinkButton from "./LinkButton"
 interface NavbarProps {
     style: string;
     icon: string;
-    children?: React.ReactNode
+    children?: React.ReactNode;
+    btnText: string;
+    btnAddress?:string;
 }
 
-function Navbar({ style, icon, children }: NavbarProps) {
+function Navbar({ style, icon, children, btnAddress, btnText }: NavbarProps) {
     return (
         <div className={styles[style]}>
             <div>
-                <img src={icon} alt="" />
-                <p>TaskFlow</p>
+                <a href="/">
+                    <img src={icon} alt="" />
+                    <p>TaskFlow</p>
+                </a>
             </div>
             {style === "navbarHorizontal" ? (
-                <LinkButton style="btnSmall" text="Sign in" address={"/lists"}/>
+                <LinkButton style="btnSmall" text={btnText} address={btnAddress}/>
             ) : (
                 <div className={styles.children}>
                     {children}
