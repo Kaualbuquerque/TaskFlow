@@ -1,6 +1,6 @@
 package com.kaualAlbuquerque.taskFlow.models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +17,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 @Entity
 @Table(name = Task.TABLE_NAME)
 public class Task {
@@ -30,9 +33,10 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "list_id", referencedColumnName = "id", nullable = false)
+    @JsonProperty(access = Access.WRITE_ONLY)
     private Lists list;
 
-    @Column(name = "title", unique = true, length = 15, nullable = false)
+    @Column(name = "title", length = 15, nullable = false)
     @NotBlank
     @Size(min = 2, max = 15)
     private String title;
@@ -43,7 +47,7 @@ public class Task {
     private String description;
 
     @Column(name = "deadline", length = 10, nullable = false)
-    private LocalDateTime deadline;
+    private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority", length = 6, nullable = false)
@@ -56,7 +60,7 @@ public class Task {
     public Task() {
     }
 
-    public Task(Long id, Lists list,  String title, String description, LocalDateTime deadline, Priority priority, boolean completed) {
+    public Task(Long id, Lists list,  String title, String description, LocalDate deadline, Priority priority, boolean completed) {
         this.id = id;
         this.list = list;
         this.title = title;
@@ -98,11 +102,11 @@ public class Task {
         this.description = description;
     }
 
-    public LocalDateTime getDeadline() {
+    public LocalDate getDeadline() {
         return this.deadline;
     }
 
-    public void setDeadline(LocalDateTime deadline) {
+    public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
     }
 
@@ -146,7 +150,7 @@ public class Task {
         return this;
     }
 
-    public Task deadline(LocalDateTime deadline) {
+    public Task deadline(LocalDate deadline) {
         setDeadline(deadline);
         return this;
     }

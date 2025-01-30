@@ -8,24 +8,27 @@ import logo from "../../assets/icons/logo.png";
 import Navbar from "../layout/Navbar";
 import ListBanner from "../layout/ListBanner";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface ListData {
+    id: number;
     name: string;
 }
 
 function Lists() {
-    const [data, setData] = useState<ListData | null>(null); // Inicializado como null para verificar posteriormente
+    const [data, setData] = useState<ListData[]>([]); // Inicializado como null para verificar posteriormente
     const [loading, setLoading] = useState(true); // Estado de carregamento
 
     useEffect(() => {
         const getAPI = async () => {
             try {
-                const response = await fetch("http://localhost:8080/list/1", { method: "GET" });
+                const response = await fetch("http://localhost:8080/list/user/3", { method: "GET" });
                 if (!response.ok) {
                     throw new Error(`Erro: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
                 setData(data);
+                console.log(data)
             } catch (error) {
                 console.error("Erro ao buscar dados:", error);
             } finally {
@@ -40,10 +43,13 @@ function Lists() {
         <div className={styles.listPage}>
             <Navbar style="navbarVertical" icon={logo} btnText="">
                 <ul>
-                    <li>List 1</li>
-                    <li>List 2</li>
-                    <li>List 3</li>
-                    +
+                    {data.map((item) => (
+                        <li key={item.id}>
+                            <Link to="/tasks">
+                                <p>{item.name}</p>
+                            </Link>
+                        </li>
+                    ))}
                 </ul>
             </Navbar>
 
@@ -51,7 +57,9 @@ function Lists() {
                 {loading && <p>Carregando...</p>}
                 {data && (
                     <>
-                        <ListBanner address={"/tasks"} name={data.name || "Sem Nome"} />
+                        {data.map((item) => (
+                            <ListBanner key={item.id} address={`/tasks`} name={item.name} />
+                        ))}
                         <ListBanner type="add" />
                     </>
                 )}

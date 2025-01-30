@@ -1,7 +1,14 @@
 /* Styles */
 import styles from "../styles/components/taskBanner.module.css"
 
-function TaskBanner() {
+interface TaskProps {
+    title?: string;
+    description?: string;
+    priority?: string;
+    deadline?: string;
+}
+
+function TaskBanner({ title, description, priority, deadline }: TaskProps) {
     return (
         <div className={styles.taskBanner}>
             <label className={styles.customCheckbox}>
@@ -10,11 +17,11 @@ function TaskBanner() {
             </label>
             <div>
                 <div className={styles.description}>
-                    <h1>Task Title</h1>
-                    <p>Description</p>
+                    <h1>{title}</h1>
+                    <p>{description}</p>
                 </div>
 
-                <p className={styles.infos}><span>Priority: Low</span> <span>dd/mm/yyyy</span></p>
+                <p className={styles.infos}><span>Priority: {priority}</span> <span>{deadline}</span></p>
             </div>
 
         </div>

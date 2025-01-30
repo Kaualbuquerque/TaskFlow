@@ -13,7 +13,7 @@
     gap: 1em;
 }
 
-.listPage li{
+.listPage li {
     font-weight: 500;
     width: 100%;
     padding-left: 1em;
@@ -31,4 +31,11 @@
     grid-template-rows: auto;
     row-gap: 2em;
     height: min-content;
+}
+
+.lists a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
 }

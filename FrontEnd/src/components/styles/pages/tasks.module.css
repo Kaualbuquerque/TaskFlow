@@ -38,15 +38,84 @@
 .tasks button {
     background-color: #d3b2e7;
     color: #ffffff;
-    border:none;
+    border: none;
     font-size: 1rem;
     font-weight: 500;
     padding: 1em;
     border-radius: 10px;
     box-shadow: 0px 2px 2px #0000001a;
+}
+
+.tasks button:hover , .form button:hover{
+    background-color: #b58bcf;
     cursor: pointer;
 }
 
-.tasks button:hover{
-    background-color: #b58bcf;
+.form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form>div {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form>div div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form> label{
+    margin: 1em 0 .25em 2em;
+    font-weight: 500;
+    align-self: flex-start;
+}
+
+.form>div label {
+    font-weight: 500;
+    margin: 1em 0 .25em 0;
+}
+
+
+.form input[type="text"] {
+    width: 90%;
+    height: 30px;
+    box-shadow: 0px 0px 2px 1px #0000001a;
+    border: none;
+    border-radius: 5px;
+    padding-left: 1em;
+    font-size: 1rem;
+}
+
+.form input[type="date"], select {
+    width: 70%;
+    height: 30px;
+    box-shadow: 0px 0px 2px 1px #0000001a;
+    border: none;
+    border-radius: 5px;
+    padding-left: 1em;
+    text-align: center;
+    font-size: 1rem;
+
+}
+
+.form button{
+    width: 90%;
+    margin-top: 2em;
+    padding: 1em;
+    border: none;
+    background-color: #E4CEF2;
+    border-radius: 10px;
+    box-shadow: 0px 1px 1px #0000001a;
+    font-size: 1rem;
+    font-weight: 500;
 }
