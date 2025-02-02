@@ -1,5 +1,5 @@
 # Etapa 1: Construir a aplicação
-FROM maven:3.8.6-openjdk-21 AS build
+FROM maven:latest AS build
 
 # Definir o diretório de trabalho dentro do container
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY . /app/
 RUN mvn clean package -DskipTests
 
 # Etapa 2: Executar a aplicação
-FROM openjdk:21-jdk-slim
+FROM openjdk:20-jdk-slim
 
 # Definir o diretório de trabalho
 WORKDIR /app
