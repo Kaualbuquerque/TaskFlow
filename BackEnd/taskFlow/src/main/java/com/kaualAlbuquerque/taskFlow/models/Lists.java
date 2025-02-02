@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 @Data
 @Table(name = Lists.TABLE_NAME)
 public class Lists {
-    private static final String TABLE_NAME = "list";
+    public static final String TABLE_NAME = "list";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
