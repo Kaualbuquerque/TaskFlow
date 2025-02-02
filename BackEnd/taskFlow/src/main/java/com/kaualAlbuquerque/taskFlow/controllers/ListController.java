@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kaualAlbuquerque.taskFlow.models.Lists;
+import com.kaualAlbuquerque.taskFlow.models.projection.ListProjection;
 import com.kaualAlbuquerque.taskFlow.services.ListService;
-import com.kaualAlbuquerque.taskFlow.services.UserService;
 
 import jakarta.validation.Valid;
 
@@ -29,8 +29,6 @@ public class ListController {
 
     @Autowired
     private ListService listService;
-    @Autowired
-    private UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Lists> findById(@PathVariable Long id) {
@@ -38,16 +36,15 @@ public class ListController {
         return ResponseEntity.ok().body(obj);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Lists>> findAllByUserId(@PathVariable Long userId) {
-        userService.findUserById(userId);
-        List<Lists> objs = this.listService.findAllByUserId(userId);
+    @GetMapping("/user")
+    public ResponseEntity<List<ListProjection>> findAllByUser() {
+        List<ListProjection> objs = this.listService.findAllByUser();
         return ResponseEntity.ok().body(objs);
     }
 
     @PostMapping
     @Validated
-    public ResponseEntity<Lists> create(@Valid @RequestBody Lists obj) {
+    public ResponseEntity<ListProjection> create(@Valid @RequestBody Lists obj) {
         this.listService.create(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(obj.getId()).toUri();
@@ -56,7 +53,7 @@ public class ListController {
 
     @PutMapping("/{id}")
     @Validated
-    public ResponseEntity<Lists> update(@Valid @RequestBody Lists obj, @PathVariable Long id) {
+    public ResponseEntity<ListProjection> update(@Valid @RequestBody Lists obj, @PathVariable Long id) {
         obj.setId(id);
         this.listService.update(obj);
         return ResponseEntity.noContent().build();

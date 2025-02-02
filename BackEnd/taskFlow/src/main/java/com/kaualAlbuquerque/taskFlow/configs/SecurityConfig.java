@@ -2,59 +2,85 @@ package com.kaualAlbuquerque.taskFlow.configs;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.kaualAlbuquerque.taskFlow.security.JWTAuthenticationFilter;
+import com.kaualAlbuquerque.taskFlow.security.JWTAuthorizationFilter;
+import com.kaualAlbuquerque.taskFlow.security.JWTUtil;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-    private static final String[] PUBLIC_MATCHERS = {
-            "/"
-    };
 
-    private static final String[] PUBLIC_MATCHERS_POST = {
-            "/user",
-            "/login"
-    };
+        private AuthenticationManager authenticationManager;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
+        @Autowired
+        private UserDetailsService userDetailsService;
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll() // Permite POST sem autenticação
-                .requestMatchers(PUBLIC_MATCHERS).permitAll() // Permite outras URLs públicas
-                .anyRequest().authenticated() // Exige autenticação para outras requisições
-        );
+        @Autowired
+        private JWTUtil jwtUtil;
 
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        private static final String[] PUBLIC_MATCHERS = {
+                        "/"
+        };
 
-        return http.build();
-    }
+        private static final String[] PUBLIC_MATCHERS_POST = {
+                        "/user",
+                        "/login"
+        };
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource(){
-        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+                        throws Exception {
+                http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+                http.authorizeHttpRequests(auth -> auth
+                                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                                .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                                .anyRequest().authenticated());
+
+                http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+                http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
+                http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, this.userDetailsService));
+
+                return http.build();
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+                        throws Exception {
+                return authenticationConfiguration.getAuthenticationManager();
+        }
+
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+                configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
+                final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
+
+        @Bean
+        public BCryptPasswordEncoder bCryptPasswordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }

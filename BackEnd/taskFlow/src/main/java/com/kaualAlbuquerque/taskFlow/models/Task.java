@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
@@ -37,13 +36,13 @@ public class Task {
     private Lists list;
 
     @Column(name = "title", length = 15, nullable = false)
-    @NotBlank
     @Size(min = 2, max = 15)
+    @NotBlank
     private String title;
 
     @Column(name = "description", length = 255, nullable = false)
-    @NotNull
     @Size(max = 255)
+    @NotBlank
     private String description;
 
     @Column(name = "deadline", length = 10, nullable = false)

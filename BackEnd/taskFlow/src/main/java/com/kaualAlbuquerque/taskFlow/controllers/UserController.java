@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kaualAlbuquerque.taskFlow.models.User;
-import com.kaualAlbuquerque.taskFlow.models.User.CreateUser;
-import com.kaualAlbuquerque.taskFlow.models.User.UpdateUser;
+import com.kaualAlbuquerque.taskFlow.models.dto.UserCreateDTO;
+import com.kaualAlbuquerque.taskFlow.models.dto.UserUpdateDTO;
 import com.kaualAlbuquerque.taskFlow.services.UserService;
 
 import jakarta.validation.Valid;
@@ -37,19 +37,19 @@ public class UserController {
     }
 
     @PostMapping
-    @Validated(CreateUser.class)
-    public ResponseEntity<User> create(@Valid @RequestBody User obj) {
-        this.userService.create(obj);
+    public ResponseEntity<User> create(@Valid @RequestBody UserCreateDTO obj) {
+        User user = this.userService.fromDTO(obj);
+        User newUser = this.userService.create(user);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(obj.getId()).toUri();
+                .path("/{id}").buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
     @PutMapping("/{id}")
-    @Validated(UpdateUser.class)
-    public ResponseEntity<Void> update(@Valid @RequestBody User obj, @PathVariable Long id) {
+    public ResponseEntity<Void> update(@Valid @RequestBody UserUpdateDTO obj, @PathVariable Long id) {
         obj.setId(id);
-        this.userService.update(obj);
+        User user = this.userService.fromDTO(obj);
+        this.userService.update(user);
         return ResponseEntity.noContent().build();
     }
 
