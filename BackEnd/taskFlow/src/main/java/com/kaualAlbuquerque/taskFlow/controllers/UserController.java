@@ -23,7 +23,7 @@ import com.kaualAlbuquerque.taskFlow.services.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user")
 @Validated
 public class UserController {
 
