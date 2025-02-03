@@ -29,58 +29,66 @@ import com.kaualAlbuquerque.taskFlow.security.JWTUtil;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-        private AuthenticationManager authenticationManager;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-        @Autowired
-        private UserDetailsService userDetailsService;
+    @Autowired
+    private JWTUtil jwtUtil;
 
-        @Autowired
-        private JWTUtil jwtUtil;
+    private static final String[] PUBLIC_MATCHERS = {
+        "/"
+    };
 
-        private static final String[] PUBLIC_MATCHERS = {
-                        "/"
-        };
+    private static final String[] PUBLIC_MATCHERS_POST = {
+        "/user",
+        "/login"
+    };
 
-        private static final String[] PUBLIC_MATCHERS_POST = {
-                        "/user",
-                        "/login"
-        };
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+            throws Exception {
+        // Desabilita CSRF e configura CORS com uma origem permitida para desenvolvimento
+        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
-                        throws Exception {
-                http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
+        // Configuração de permissões para requisições POST nas rotas públicas
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                .anyRequest().authenticated());
 
-                http.authorizeHttpRequests(auth -> auth
-                                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                                .requestMatchers(PUBLIC_MATCHERS).permitAll()
-                                .anyRequest().authenticated());
+        // Define a política de sessão como stateless para usar JWT (sem estado)
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // Adiciona os filtros JWT
+        http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
+        http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, this.userDetailsService));
 
-                http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
-                http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, this.userDetailsService));
+        return http.build();
+    }
 
-                return http.build();
-        }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
-        @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-                        throws Exception {
-                return authenticationConfiguration.getAuthenticationManager();
-        }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        @Bean
-        CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-                configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
-                final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                return source;
-        }
+        // Permite todas as origens (para desenvolvimento, modifique para produção)
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
-        @Bean
-        public BCryptPasswordEncoder bCryptPasswordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
