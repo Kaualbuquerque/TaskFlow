@@ -23,11 +23,10 @@ public class JWTUtil {
 
     public String generateToken(String username) {
         SecretKey key = getKeyBySecret();
-
         return Jwts.builder()
-                .subject(username) // Atualizado: `setSubject()` agora é `subject()`
-                .expiration(new Date(System.currentTimeMillis() + this.expiration)) // Correção na criação da data
-                .signWith(key, Jwts.SIG.HS256) // Correção: Algoritmo deve ser especificado
+                .subject(username) // Alterado para o novo padrão
+                .expiration(new Date(System.currentTimeMillis() + this.expiration))
+                .signWith(key) // Algoritmo explícito
                 .compact();
     }
 
@@ -42,11 +41,9 @@ public class JWTUtil {
             String username = claims.getSubject();
             Date expirationDate = claims.getExpiration();
             Date now = new Date(System.currentTimeMillis());
-            if (Objects.nonNull(username) && Objects.nonNull(expirationDate) && now.before(expirationDate)) {
+            if (Objects.nonNull(username) && Objects.nonNull(expirationDate) && now.before(expirationDate))
                 return true;
-            }
         }
-
         return false;
     }
 
@@ -61,12 +58,13 @@ public class JWTUtil {
         SecretKey key = getKeyBySecret();
         try {
             return Jwts.parser()
-                    .verifyWith(key) // Alterado de setSigningKey() para verifyWith()
+                    .verifyWith(key) // Método atualizado para verificação de assinatura
                     .build()
-                    .parseSignedClaims(token) // Alterado de parseClaimsJws() para parseSignedClaims()
-                    .getPayload(); // O corpo do JWT agora é acessado assim
+                    .parseSignedClaims(token) // Método atualizado para extrair as Claims
+                    .getPayload();
         } catch (Exception e) {
-            return null; // Retorna null caso o token seja inválido
+            return null;
         }
     }
+
 }

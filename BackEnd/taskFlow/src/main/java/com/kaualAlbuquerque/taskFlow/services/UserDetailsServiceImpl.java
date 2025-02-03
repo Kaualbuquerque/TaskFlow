@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.kaualAlbuquerque.taskFlow.models.User;
 import com.kaualAlbuquerque.taskFlow.repositories.UserRepository;
-import com.kaualAlbuquerque.taskFlow.security.UserSS;
+import com.kaualAlbuquerque.taskFlow.security.UserSpringSecurity;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -21,10 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = this.userRepository.findByUsername(username);
-        if (Objects.isNull(user)) {
-            throw new UsernameNotFoundException("Usuário não encontrado" + username);
-        }
-        return new UserSS(user.getId(), user.getUsername(), user.getPassword(), user.getProfiles());
+        if (Objects.isNull(user))
+            throw new UsernameNotFoundException("Usuário não encontrado: " + username);
+        return new UserSpringSecurity(user.getId(), user.getUsername(), user.getPassword(), user.getProfiles());
     }
 
 }

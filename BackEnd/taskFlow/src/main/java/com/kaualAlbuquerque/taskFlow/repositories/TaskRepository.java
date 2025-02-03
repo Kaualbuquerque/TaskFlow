@@ -10,6 +10,6 @@ import com.kaualAlbuquerque.taskFlow.models.Task;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    List<Task> findByList_Id(Long id);
+    List<Task> findByUser_Id(Long id);
 
 }

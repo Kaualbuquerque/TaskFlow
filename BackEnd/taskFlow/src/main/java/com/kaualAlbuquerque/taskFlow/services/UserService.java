@@ -16,8 +16,10 @@ import com.kaualAlbuquerque.taskFlow.models.dto.UserCreateDTO;
 import com.kaualAlbuquerque.taskFlow.models.dto.UserUpdateDTO;
 import com.kaualAlbuquerque.taskFlow.models.enums.ProfileEnum;
 import com.kaualAlbuquerque.taskFlow.repositories.UserRepository;
-import com.kaualAlbuquerque.taskFlow.security.UserSS;
+import com.kaualAlbuquerque.taskFlow.security.UserSpringSecurity;
 import com.kaualAlbuquerque.taskFlow.services.exceptions.AuthorizationException;
+import com.kaualAlbuquerque.taskFlow.services.exceptions.DataBindingViolationException;
+import com.kaualAlbuquerque.taskFlow.services.exceptions.ObjectNotFoundException;
 
 import jakarta.validation.Valid;
 
@@ -30,14 +32,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User findUserById(Long id) {
-
-        UserSS userSS = authenticated();
-        if (!Objects.nonNull(userSS) || !userSS.hasRole(ProfileEnum.ADMIN) && !id.equals(userSS.getId()))
-            throw new AuthorizationException("Access denied!");
+    public User findById(Long id) {
+        UserSpringSecurity userSpringSecurity = authenticated();
+        if (!Objects.nonNull(userSpringSecurity)
+                || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !id.equals(userSpringSecurity.getId()))
+            throw new AuthorizationException("Acesso negado!");
 
         Optional<User> user = this.userRepository.findById(id);
-        return user.orElseThrow(() -> new RuntimeException(
+        return user.orElseThrow(() -> new ObjectNotFoundException(
                 "Usuário não encontrado! Id: " + id + ", Tipo: " + User.class.getName()));
     }
 
@@ -52,26 +54,24 @@ public class UserService {
 
     @Transactional
     public User update(User obj) {
-        User newObj = findUserById(obj.getId());
-        if (obj.getPassword() != null) {
-            newObj.setPassword(obj.getPassword());
-            newObj.setPassword(this.bCryptPasswordEncoder.encode(obj.getPassword()));
-        }
+        User newObj = findById(obj.getId());
+        newObj.setPassword(obj.getPassword());
+        newObj.setPassword(this.bCryptPasswordEncoder.encode(obj.getPassword()));
         return this.userRepository.save(newObj);
     }
 
     public void delete(Long id) {
-        findUserById(id);
+        findById(id);
         try {
             this.userRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("Não é possível excluir pois há entidades relacionadas!");
+            throw new DataBindingViolationException("Não é possível excluir pois há entidades relacionadas!");
         }
     }
 
-    public static UserSS authenticated() {
+    public static UserSpringSecurity authenticated() {
         try {
-            return (UserSS) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return (UserSpringSecurity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         } catch (Exception e) {
             return null;
         }
@@ -90,4 +90,5 @@ public class UserService {
         user.setPassword(obj.getPassword());
         return user;
     }
+
 }

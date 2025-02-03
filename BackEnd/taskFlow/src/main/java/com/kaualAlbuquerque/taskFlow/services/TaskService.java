@@ -2,17 +2,18 @@ package com.kaualAlbuquerque.taskFlow.services;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kaualAlbuquerque.taskFlow.models.Lists;
 import com.kaualAlbuquerque.taskFlow.models.Task;
+import com.kaualAlbuquerque.taskFlow.models.User;
 import com.kaualAlbuquerque.taskFlow.models.enums.ProfileEnum;
 import com.kaualAlbuquerque.taskFlow.repositories.TaskRepository;
-import com.kaualAlbuquerque.taskFlow.security.UserSS;
+import com.kaualAlbuquerque.taskFlow.security.UserSpringSecurity;
 import com.kaualAlbuquerque.taskFlow.services.exceptions.AuthorizationException;
+import com.kaualAlbuquerque.taskFlow.services.exceptions.DataBindingViolationException;
+import com.kaualAlbuquerque.taskFlow.services.exceptions.ObjectNotFoundException;
 
 import jakarta.transaction.Transactional;
 
@@ -23,65 +24,60 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     @Autowired
-    private ListService listService;
-
-    @Autowired
     private UserService userService;
 
-    public Task findTaskById(Long id) {
-        Task task = this.taskRepository.findById(id).orElseThrow(() -> new RuntimeException(
+    public Task findById(Long id) {
+        Task task = this.taskRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException(
                 "Tarefa não encontrada! Id: " + id + ", Tipo: " + Task.class.getName()));
 
-        UserSS userSS = userService.authenticated();
-        if (Objects.isNull(userSS) || !userSS.hasRole(ProfileEnum.ADMIN) && !userHasTask(userSS, task))
-            throw new AuthorizationException("Access denied!");
+        UserSpringSecurity userSpringSecurity = UserService.authenticated();
+        if (Objects.isNull(userSpringSecurity)
+                || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !userHasTask(userSpringSecurity, task))
+            throw new AuthorizationException("Acesso negado!");
 
         return task;
     }
 
-    public List<Task> findAllByListId(long listId) {
-        List<Task> tasks = this.taskRepository.findByList_Id(listId);
+    public List<Task> findAllByUser() {
+        UserSpringSecurity userSpringSecurity = UserService.authenticated();
+        if (Objects.isNull(userSpringSecurity))
+            throw new AuthorizationException("Acesso negado!");
+
+        List<Task> tasks = this.taskRepository.findByUser_Id(userSpringSecurity.getId());
         return tasks;
     }
 
     @Transactional
     public Task create(Task obj) {
-        Lists list = this.listService.findListById(obj.getList().getId());
+        UserSpringSecurity userSpringSecurity = UserService.authenticated();
+        if (Objects.isNull(userSpringSecurity))
+            throw new AuthorizationException("Acesso negado!");
+
+        User user = this.userService.findById(userSpringSecurity.getId());
         obj.setId(null);
-        obj.setList(list);
+        obj.setUser(user);
         obj = this.taskRepository.save(obj);
         return obj;
     }
 
     @Transactional
     public Task update(Task obj) {
-        Task newObj = findTaskById(obj.getId());
-        if (obj.getTitle() != null) {
-            newObj.setTitle(obj.getTitle());
-        }
-        if (obj.getDescription() != null) {
-            newObj.setDescription(obj.getDescription());
-        }
-        if (obj.getPriority() != null) {
-            newObj.setPriority(obj.getPriority());
-        }
-        if (obj.getDeadline() != null) {
-            newObj.setDeadline(obj.getDeadline());
-        }
-        newObj.setCompleted(obj.getCompleted());
+        Task newObj = findById(obj.getId());
+        newObj.setDescription(obj.getDescription());
         return this.taskRepository.save(newObj);
     }
 
     public void delete(Long id) {
-        findTaskById(id);
+        findById(id);
         try {
             this.taskRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("Não é possível excluir pois há entidades relacionadas!");
+            throw new DataBindingViolationException("Não é possível excluir pois há entidades relacionadas!");
         }
     }
 
-    public Boolean userHasTask(UserSS userSS, Task task) {
-        return task.getList().getUser().getId().equals(userSS.getId());
+    private Boolean userHasTask(UserSpringSecurity userSpringSecurity, Task task) {
+        return task.getUser().getId().equals(userSpringSecurity.getId());
     }
+
 }
