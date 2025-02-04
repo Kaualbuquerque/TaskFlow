@@ -38,10 +38,13 @@ public class SecurityConfig {
         http.cors(c -> c.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.addAllowedOrigin("*"); // Permite todas as origens
-            config.addAllowedMethod("*"); // Permite todos os métodos (GET, POST, PUT, DELETE, etc.)
+            config.addAllowedMethod("GET"); // Permite o método GET
+            config.addAllowedMethod("POST"); // Permite o método POST
+            config.addAllowedMethod("PUT"); // Permite o método PUT
+            config.addAllowedMethod("DELETE"); // Permite o método DELETE
             config.addAllowedHeader("*"); // Permite todos os cabeçalhos
             return config;
-        })).csrf(csrf -> csrf.disable()); // Desabilita CSRF
+        })).csrf(csrf -> csrf.disable());
 
         // Permite todas as requisições (GET, POST, PUT, DELETE, etc.) sem autenticação
         http.authorizeHttpRequests(auth -> auth
