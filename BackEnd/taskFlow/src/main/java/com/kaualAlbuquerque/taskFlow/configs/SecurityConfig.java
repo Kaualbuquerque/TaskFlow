@@ -1,5 +1,7 @@
 package com.kaualAlbuquerque.taskFlow.configs;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,14 +39,13 @@ public class SecurityConfig {
         // Configura CORS para permitir todos os tipos de requisições
         http.cors(c -> c.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.addAllowedOrigin("*"); // Permite todas as origens
-            config.addAllowedMethod("GET"); // Permite o método GET
-            config.addAllowedMethod("POST"); // Permite o método POST
-            config.addAllowedMethod("PUT"); // Permite o método PUT
-            config.addAllowedMethod("DELETE"); // Permite o método DELETE
-            config.addAllowedHeader("*"); // Permite todos os cabeçalhos
+            config.setAllowedOriginPatterns(List.of("*"));
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+            config.setAllowedHeaders(List.of("*")); 
+            config.setAllowCredentials(true); 
             return config;
-        })).csrf(csrf -> csrf.disable());
+        })).csrf(csrf -> csrf.disable()); // Desabilita CSRF
+        
 
         // Permite todas as requisições (GET, POST, PUT, DELETE, etc.) sem autenticação
         http.authorizeHttpRequests(auth -> auth
