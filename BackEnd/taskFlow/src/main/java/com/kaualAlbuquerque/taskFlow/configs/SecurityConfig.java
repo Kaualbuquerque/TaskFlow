@@ -1,15 +1,11 @@
 package com.kaualAlbuquerque.taskFlow.configs;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,26 +31,21 @@ public class SecurityConfig {
     @Autowired
     private JWTUtil jwtUtil;
 
-    private static final String[] PUBLIC_MATCHERS = {
-            "/"
-    };
-    private static final String[] PUBLIC_MATCHERS_POST = {
-            "/user",
-            "/login"
-    };
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
             throws Exception {
-        // Desabilita CSRF e configura CORS com uma origem permitida para
-        // desenvolvimento
-        http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
+        // Configura CORS para permitir todos os tipos de requisições
+        http.cors(c -> c.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("*"); // Permite todas as origens
+            config.addAllowedMethod("*"); // Permite todos os métodos (GET, POST, PUT, DELETE, etc.)
+            config.addAllowedHeader("*"); // Permite todos os cabeçalhos
+            return config;
+        })).csrf(csrf -> csrf.disable()); // Desabilita CSRF
 
-        // Configuração de permissões para requisições POST nas rotas públicas
+        // Permite todas as requisições (GET, POST, PUT, DELETE, etc.) sem autenticação
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                .requestMatchers(PUBLIC_MATCHERS).permitAll()
-                .anyRequest().authenticated());
+                .anyRequest().permitAll());
 
         // Define a política de sessão como stateless para usar JWT (sem estado)
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -81,10 +72,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedOrigin("*"); // Permite todas as origens
+        configuration.addAllowedHeader("*"); // Permite todos os cabeçalhos
+        configuration.addAllowedMethod("*"); // Permite todos os métodos (GET, POST, etc.)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
